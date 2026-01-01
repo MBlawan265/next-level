@@ -384,6 +384,15 @@ class DownloadHandler {
     handleDownload(e, button) {
         e.preventDefault();
 
+        // Check if user is on mobile device
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+        if (isMobile) {
+            // Show message that app is for Windows PC only
+            this.showMobileMessage(button);
+            return;
+        }
+
         // Get download URL from config (works on all devices)
         const downloadUrl = window.NEXTLEVEL_CONFIG?.downloadUrl || localStorage.getItem('nextlevel_download_url');
 
@@ -400,6 +409,21 @@ class DownloadHandler {
             // No URL configured - show message
             this.showNoDownloadMessage(button);
         }
+    }
+
+    showMobileMessage(button) {
+        const originalText = button.querySelector('.btn-text')?.textContent || 'Download Beta';
+        const textElement = button.querySelector('.btn-text');
+
+        if (textElement) {
+            textElement.textContent = 'Windows PC Only';
+            setTimeout(() => {
+                textElement.textContent = originalText;
+            }, 3000);
+        }
+
+        // Also show an alert for clarity
+        alert('This app is currently available for Windows PC only.\\n\\nMobile versions (Android & iOS) are coming soon!');
     }
 
     isValidUrl(string) {
