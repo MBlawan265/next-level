@@ -285,8 +285,8 @@ class BetaForm {
         // Show loading state
         this.setLoading(true);
 
-        // Get Google Script URL from localStorage (set by admin)
-        const scriptUrl = localStorage.getItem('nextlevel_script_url');
+        // Get Google Script URL from config (works on all devices)
+        const scriptUrl = window.NEXTLEVEL_CONFIG?.scriptUrl || localStorage.getItem('nextlevel_script_url');
 
         if (scriptUrl) {
             try {
@@ -384,8 +384,8 @@ class DownloadHandler {
     handleDownload(e, button) {
         e.preventDefault();
 
-        // Get download URL from localStorage (set by admin)
-        const downloadUrl = localStorage.getItem('nextlevel_download_url');
+        // Get download URL from config (works on all devices)
+        const downloadUrl = window.NEXTLEVEL_CONFIG?.downloadUrl || localStorage.getItem('nextlevel_download_url');
 
         if (downloadUrl && this.isValidUrl(downloadUrl)) {
             // Open download link in new tab
@@ -412,7 +412,7 @@ class DownloadHandler {
     }
 
     updateButtonStates() {
-        const downloadUrl = localStorage.getItem('nextlevel_download_url');
+        const downloadUrl = window.NEXTLEVEL_CONFIG?.downloadUrl || localStorage.getItem('nextlevel_download_url');
         const hasValidUrl = downloadUrl && this.isValidUrl(downloadUrl);
 
         [this.downloadBtn, this.downloadHeroBtn].forEach(btn => {
