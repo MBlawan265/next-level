@@ -23,7 +23,7 @@ window.NEXTLEVEL_CONFIG = {
     // Paste your download link (Google Drive or direct link)
     // Example: 'https://drive.google.com/uc?id=YOUR_FILE_ID&export=download'
     // ==========================================================================
-    downloadUrl: '',  // <-- PASTE YOUR DOWNLOAD URL HERE
+    downloadUrl: 'https://drive.google.com/uc?id=14JQB153_9GuZv6vYvN3-jG7lQh2H9v8z&export=download',
 
     // ==========================================================================
     // ADMIN PASSWORD
