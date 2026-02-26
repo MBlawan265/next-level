@@ -24,27 +24,13 @@
                 <p class="login-subtitle">Next Level Dashboard</p>
             </div>
 
-            <!-- First Time Setup -->
-            <div class="login-form" id="setup-form">
-                <h2 class="form-title">First Time Setup</h2>
-                <p class="form-desc">Create your admin password</p>
-                <div class="input-group">
-                    <input type="password" id="new-password" class="admin-input" placeholder="Enter new password"
-                        minlength="4" required>
-                </div>
-                <div class="input-group">
-                    <input type="password" id="confirm-password" class="admin-input" placeholder="Confirm password"
-                        minlength="4" required>
-                </div>
-                <button type="button" class="btn btn-primary btn-full" id="setup-btn">
-                    Set Password
-                </button>
-                <p class="form-error" id="setup-error"></p>
-            </div>
-
             <!-- Login Form -->
-            <div class="login-form" id="auth-form" style="display: none;">
+            <div class="login-form" id="auth-form">
                 <h2 class="form-title">Login</h2>
+                <div class="input-group">
+                    <input type="text" id="admin-id" class="admin-input" placeholder="Enter Admin ID" required
+                        autocomplete="off">
+                </div>
                 <div class="input-group">
                     <input type="password" id="password" class="admin-input" placeholder="Enter password" required>
                 </div>
