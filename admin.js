@@ -12,11 +12,8 @@ const STORAGE_KEYS = {
     SCRIPT_URL: 'nextlevel_script_url'
 };
 
-// Initialize Supabase
-const supabase = window.supabase.createClient(
-    window.NEXTLEVEL_CONFIG.supabaseUrl,
-    window.NEXTLEVEL_CONFIG.supabaseKey
-);
+// Initialize Supabase from window (set in config.js)
+const supabase = window.supabase;
 
 // ============================================================================
 // DOM ELEMENTS
@@ -26,7 +23,7 @@ const elements = {
     // Login
     loginScreen: document.getElementById('login-screen'),
     authForm: document.getElementById('auth-form'),
-    adminId: document.getElementById('admin-id'),
+    adminEmail: document.getElementById('admin-email'),
     password: document.getElementById('password'),
     loginBtn: document.getElementById('login-btn'),
     loginError: document.getElementById('login-error'),
@@ -68,90 +65,62 @@ const elements = {
 // AUTHENTICATION
 // ============================================================================
 
-class AdminAuth {
-    constructor() {
-        this.init();
+// Global login function expected by HTML onclick
+window.loginAdmin = async function () {
+    const email = elements.adminEmail.value;
+    const password = elements.password.value;
+
+    const { data, error } = await window.supabase.auth.signInWithPassword({
+        email,
+        password
+    });
+
+    if (error) {
+        console.error("Login failed:", error);
+        alert(error.message);
+        return;
     }
 
-    init() {
-        this.checkExistingPassword();
-        this.bindEvents();
+    // Success: store session flag and show dashboard
+    sessionStorage.setItem(STORAGE_KEYS.SESSION, 'true');
+    elements.adminEmail.value = '';
+    elements.password.value = '';
+
+    // Switch UI manually as it's an SPA
+    elements.loginScreen.style.display = 'none';
+    elements.dashboard.style.display = 'block';
+
+    // Initialize Dashboard after login
+    new SettingsManager();
+};
+
+window.logoutAdmin = async function () {
+    await window.supabase.auth.signOut();
+    sessionStorage.removeItem(STORAGE_KEYS.SESSION);
+    elements.dashboard.style.display = 'none';
+    elements.loginScreen.style.display = 'flex';
+    if (elements.adminEmail) elements.adminEmail.value = '';
+    if (elements.password) elements.password.value = '';
+};
+
+// Also bind logout button
+if (elements.logoutBtn) {
+    elements.logoutBtn.addEventListener('click', window.logoutAdmin);
+}
+
+function checkExistingSession() {
+    const hasSession = sessionStorage.getItem(STORAGE_KEYS.SESSION);
+
+    // Always show login form by default
+    if (elements.authForm) {
+        elements.authForm.style.display = 'block';
     }
 
-    checkExistingPassword() {
-        const hasSession = sessionStorage.getItem(STORAGE_KEYS.SESSION);
-
-        // Always show login form
-        if (elements.authForm) {
-            elements.authForm.style.display = 'block';
-        }
-
-        // Check if already logged in this session
-        if (hasSession) {
-            this.showDashboard();
-        }
-    }
-
-    bindEvents() {
-        // Login
-        elements.loginBtn?.addEventListener('click', (e) => this.handleLogin(e));
-
-        const triggerLogin = (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                this.handleLogin(e);
-            }
-        };
-
-        elements.adminId?.addEventListener('keypress', triggerLogin);
-        elements.password?.addEventListener('keypress', triggerLogin);
-
-        // Logout
-        elements.logoutBtn?.addEventListener('click', () => this.handleLogout());
-    }
-
-    handleLogin(e) {
-        if (e) e.preventDefault();
-
-        const inputId = elements.adminId.value;
-        const inputPass = elements.password.value;
-
-        // Hardcoded admin credentials
-        const expectedId = 'PROJECT-SHARKOLLE';
-        const expectedPassword = 'Amir@2015';
-
-        if (inputId === expectedId && inputPass === expectedPassword) {
-            sessionStorage.setItem(STORAGE_KEYS.SESSION, 'true');
-            elements.adminId.value = '';
-            elements.password.value = '';
-            this.showDashboard();
-        } else {
-            this.showError('Invalid Admin ID or Password');
-        }
-    }
-
-    handleLogout() {
-        sessionStorage.removeItem(STORAGE_KEYS.SESSION);
-        elements.dashboard.style.display = 'none';
-        elements.loginScreen.style.display = 'flex';
-        if (elements.adminId) elements.adminId.value = '';
-        if (elements.password) elements.password.value = '';
-    }
-
-    showDashboard() {
+    // Check if already logged in this session
+    if (hasSession) {
         elements.loginScreen.style.display = 'none';
         elements.dashboard.style.display = 'block';
-
-        // Load saved settings
         new SettingsManager();
-    }
-
-    showError(message) {
-        const errorEl = elements.loginError;
-        if (errorEl) {
-            errorEl.textContent = message;
-            setTimeout(() => { errorEl.textContent = ''; }, 3000);
-        }
     }
 }
 
@@ -441,6 +410,6 @@ class SettingsManager {
 // ============================================================================
 
 document.addEventListener('DOMContentLoaded', () => {
-    new AdminAuth();
+    checkExistingSession();
     console.log('🔐 Next Level Admin Dashboard loaded');
 }); 
