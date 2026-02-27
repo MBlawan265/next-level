@@ -388,13 +388,13 @@ class DownloadHandler {
     }
 
     handleDownload(e, button) {
-        // Check if user is on mobile device
-        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        // Check if user is on a Windows PC
+        const isWindows = /Windows/i.test(navigator.userAgent);
 
-        if (isMobile) {
+        if (!isWindows) {
             e.preventDefault();
             // Show message that app is for Windows PC only
-            this.showMobileMessage(button);
+            this.showNonWindowsMessage(button);
             return;
         }
 
@@ -423,7 +423,7 @@ class DownloadHandler {
         }
     }
 
-    showMobileMessage(button) {
+    showNonWindowsMessage(button) {
         const originalText = button.querySelector('.btn-text')?.textContent || 'Download Beta';
         const textElement = button.querySelector('.btn-text');
 
@@ -435,7 +435,7 @@ class DownloadHandler {
         }
 
         // Also show an alert for clarity
-        alert('This app is currently available for Windows PC only.\\n\\nMobile versions (Android & iOS) are coming soon!');
+        alert('The Android, iOS, and macOS versions are not available yet. The app is currently only available for Windows PC.');
     }
 
     isValidUrl(string) {
