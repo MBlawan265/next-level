@@ -358,6 +358,7 @@ class DownloadHandler {
     constructor() {
         this.downloadBtn = document.getElementById('download-btn');
         this.downloadHeroBtn = document.getElementById('download-hero-btn');
+        this.downloadWindowsBtn = document.getElementById('download-windows-btn');
 
         this.init();
     }
@@ -373,6 +374,11 @@ class DownloadHandler {
             this.setupButton(this.downloadHeroBtn);
         }
 
+        // Windows platform button
+        if (this.downloadWindowsBtn) {
+            this.setupButton(this.downloadWindowsBtn);
+        }
+
         // Update button states on load
         this.updateButtonStates();
     }
@@ -382,12 +388,11 @@ class DownloadHandler {
     }
 
     handleDownload(e, button) {
-        e.preventDefault();
-
         // Check if user is on mobile device
         const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
         if (isMobile) {
+            e.preventDefault();
             // Show message that app is for Windows PC only
             this.showMobileMessage(button);
             return;
@@ -397,15 +402,22 @@ class DownloadHandler {
         const downloadUrl = window.NEXTLEVEL_CONFIG?.downloadUrl || localStorage.getItem('nextlevel_download_url');
 
         if (downloadUrl && this.isValidUrl(downloadUrl)) {
-            // Open download link in new tab
-            window.open(downloadUrl, '_blank');
-
             // Visual feedback
             button.classList.add('clicked');
             setTimeout(() => button.classList.remove('clicked'), 300);
 
+            // If it's an anchor tag, let the browser handle the download naturally
+            if (button.tagName === 'A') {
+                return; // Do not call e.preventDefault()
+            }
+
+            e.preventDefault();
+            // Fallback: trigger download directly via location change
+            window.location.href = downloadUrl;
+
             console.log('Download initiated:', downloadUrl);
         } else {
+            e.preventDefault();
             // No URL configured - show message
             this.showNoDownloadMessage(button);
         }
@@ -439,14 +451,16 @@ class DownloadHandler {
         const downloadUrl = window.NEXTLEVEL_CONFIG?.downloadUrl || localStorage.getItem('nextlevel_download_url');
         const hasValidUrl = downloadUrl && this.isValidUrl(downloadUrl);
 
-        [this.downloadBtn, this.downloadHeroBtn].forEach(btn => {
+        [this.downloadBtn, this.downloadHeroBtn, this.downloadWindowsBtn].forEach(btn => {
             if (btn) {
                 if (!hasValidUrl) {
                     btn.disabled = true;
                     btn.title = 'Download coming soon';
+                    if (btn.tagName === 'A') btn.removeAttribute('href');
                 } else {
                     btn.disabled = false;
                     btn.title = 'Download the latest version';
+                    if (btn.tagName === 'A') btn.href = downloadUrl;
                 }
             }
         });

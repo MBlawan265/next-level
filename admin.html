@@ -102,20 +102,19 @@
                     <div class="admin-card">
                         <div class="card-content">
                             <label class="input-label">
-                                Download URL (Google Drive or External Link)
-                                <span class="label-hint">Users will be redirected to this URL when clicking
+                                Direct Download URL
+                                <span class="label-hint">Users will download from this URL immediately when they click
                                     Download</span>
                             </label>
                             <div class="input-row">
                                 <input type="url" id="download-url" class="admin-input"
-                                    placeholder="https://drive.google.com/uc?id=FILE_ID&export=download">
+                                    placeholder="https://domain.com/path/to/app.zip">
                                 <button class="btn btn-primary" id="save-download-btn">
                                     Save
                                 </button>
                             </div>
                             <p class="input-help">
-                                For Google Drive: Use format
-                                <code>https://drive.google.com/uc?id=FILE_ID&export=download</code>
+                                E.g., a GitHub Release .zip link. Avoid indirect links that require a landing page.
                             </p>
                             <div class="status-badge" id="download-status"></div>
 
