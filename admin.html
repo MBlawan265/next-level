@@ -135,6 +135,33 @@
                     </div>
                 </section>
 
+                <!-- Video Manager Section -->
+                <section class="admin-section">
+                    <div class="section-header">
+                        <h2 class="section-title">📺 Install Video Settings</h2>
+                    </div>
+                    <div class="admin-card">
+                        <div class="card-content">
+                            <label class="input-label">
+                                YouTube Video URL
+                                <span class="label-hint">This video will appear under 'How to Install' and
+                                    autoplay</span>
+                            </label>
+                            <div class="input-row">
+                                <input type="url" id="youtube-url" class="admin-input"
+                                    placeholder="https://www.youtube.com/watch?v=...">
+                                <button class="btn btn-primary" id="save-youtube-btn">
+                                    Save
+                                </button>
+                            </div>
+                            <p class="input-help">
+                                Paste any YouTube link. It will automatically be converted to an embedded format.
+                            </p>
+                            <div class="status-badge" id="youtube-status"></div>
+                        </div>
+                    </div>
+                </section>
+
                 <!-- Help Section -->
                 <section class="admin-section" id="help-section" style="display: none;">
                     <div class="section-header">
@@ -202,6 +229,13 @@ function doGet(e) {
                             <div class="stat-content">
                                 <span class="stat-label">Download Status</span>
                                 <span class="stat-value" id="stat-download">Not Configured</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">📈</div>
+                            <div class="stat-content">
+                                <span class="stat-label">Total Downloads</span>
+                                <span class="stat-value active" id="stat-download-count">Loading...</span>
                             </div>
                         </div>
                     </div>

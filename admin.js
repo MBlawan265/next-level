@@ -10,7 +10,8 @@ const STORAGE_KEYS = {
     PASSWORD: 'nextlevel_admin_password',
     SESSION: 'nextlevel_admin_session',
     SCRIPT_URL: 'nextlevel_script_url',
-    DOWNLOAD_URL: 'nextlevel_download_url'
+    DOWNLOAD_URL: 'nextlevel_download_url',
+    YOUTUBE_URL: 'nextlevel_youtube_url'
 };
 
 // ============================================================================
@@ -44,13 +45,19 @@ const elements = {
     currentDownloadUrl: document.getElementById('current-download-url'),
     removeDownloadBtn: document.getElementById('remove-download-btn'),
 
+    // YouTube URL
+    youtubeUrl: document.getElementById('youtube-url'),
+    saveYoutubeBtn: document.getElementById('save-youtube-btn'),
+    youtubeStatus: document.getElementById('youtube-status'),
+
     // Help
     helpSection: document.getElementById('help-section'),
     closeHelpBtn: document.getElementById('close-help-btn'),
 
     // Stats
     statScript: document.getElementById('stat-script'),
-    statDownload: document.getElementById('stat-download')
+    statDownload: document.getElementById('stat-download'),
+    statDownloadCount: document.getElementById('stat-download-count')
 };
 
 // ============================================================================
@@ -163,6 +170,15 @@ class SettingsManager {
             elements.downloadUrl.value = downloadUrl;
             this.showDownloadInfo(downloadUrl);
         }
+
+        // Load YouTube URL
+        const youtubeUrl = localStorage.getItem(STORAGE_KEYS.YOUTUBE_URL);
+        if (youtubeUrl) {
+            elements.youtubeUrl.value = youtubeUrl;
+        }
+
+        // Fetch Total Downloads
+        this.fetchDownloadCount();
     }
 
     bindEvents() {
@@ -172,6 +188,9 @@ class SettingsManager {
         // Download URL
         elements.saveDownloadBtn?.addEventListener('click', () => this.saveDownloadUrl());
         elements.removeDownloadBtn?.addEventListener('click', () => this.removeDownloadUrl());
+
+        // YouTube URL
+        elements.saveYoutubeBtn?.addEventListener('click', () => this.saveYoutubeUrl());
 
         // Help
         elements.scriptHelpLink?.addEventListener('click', (e) => {
@@ -236,13 +255,38 @@ class SettingsManager {
         console.log('Download URL removed');
     }
 
+    saveYoutubeUrl() {
+        const url = elements.youtubeUrl.value.trim();
+
+        if (!url) {
+            localStorage.removeItem(STORAGE_KEYS.YOUTUBE_URL);
+            this.showStatus('youtube', 'Installation video disabled', 'success');
+            return;
+        }
+
+        if (!url.includes('youtube.com') && !url.includes('youtu.be')) {
+            this.showStatus('youtube', 'Please enter a valid YouTube URL', 'error');
+            return;
+        }
+
+        localStorage.setItem(STORAGE_KEYS.YOUTUBE_URL, url);
+        this.showStatus('youtube', '✓ Saved successfully', 'success');
+        console.log('YouTube URL saved:', url);
+    }
+
     showDownloadInfo(url) {
         elements.downloadInfo.style.display = 'block';
         elements.currentDownloadUrl.textContent = url;
     }
 
     showStatus(type, message, status) {
-        const statusEl = type === 'script' ? elements.scriptStatus : elements.downloadStatus;
+        let statusEl;
+        if (type === 'script') statusEl = elements.scriptStatus;
+        else if (type === 'download') statusEl = elements.downloadStatus;
+        else if (type === 'youtube') statusEl = elements.youtubeStatus;
+
+        if (!statusEl) return;
+
         statusEl.textContent = message;
         statusEl.className = 'status-badge ' + status;
 
@@ -273,6 +317,25 @@ class SettingsManager {
         }
     }
 
+    async fetchDownloadCount() {
+        if (!elements.statDownloadCount) return;
+
+        try {
+            const response = await fetch('https://api.counterapi.dev/v1/nextlevelfitness/downloads');
+            const data = await response.json();
+
+            if (data && data.count !== undefined) {
+                elements.statDownloadCount.textContent = data.count.toLocaleString();
+            } else {
+                elements.statDownloadCount.textContent = '0';
+            }
+        } catch (error) {
+            console.error('Error fetching download count:', error);
+            elements.statDownloadCount.textContent = 'Error';
+        }
+    }
+
+
     isValidUrl(string) {
         try {
             new URL(string);
@@ -290,4 +353,4 @@ class SettingsManager {
 document.addEventListener('DOMContentLoaded', () => {
     new AdminAuth();
     console.log('🔐 Next Level Admin Dashboard loaded');
-});
+}); 

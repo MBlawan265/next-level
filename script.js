@@ -387,7 +387,7 @@ class DownloadHandler {
         button.addEventListener('click', (e) => this.handleDownload(e, button));
     }
 
-    handleDownload(e, button) {
+    async handleDownload(e, button) {
         // Check if user is on a Windows PC
         const isWindows = /Windows/i.test(navigator.userAgent);
 
@@ -396,6 +396,13 @@ class DownloadHandler {
             // Show message that app is for Windows PC only
             this.showNonWindowsMessage(button);
             return;
+        }
+
+        // Increment the download counter asynchronously without blocking
+        try {
+            fetch('https://api.counterapi.dev/v1/nextlevelfitness/downloads/up');
+        } catch (error) {
+            console.error('Failed to increment download count:', error);
         }
 
         // Get download URL from config (works on all devices)
@@ -613,6 +620,49 @@ rippleStyles.textContent = `
 document.head.appendChild(rippleStyles);
 
 // ============================================================================
+// INSTALL VIDEO HANDLER
+// ============================================================================
+
+class InstallVideo {
+    constructor() {
+        this.section = document.getElementById('install-guide');
+        this.container = document.getElementById('install-video-container');
+        this.init();
+    }
+
+    init() {
+        if (!this.section || !this.container) return;
+
+        const youtubeUrl = window.NEXTLEVEL_CONFIG?.youtubeUrl || localStorage.getItem('nextlevel_youtube_url');
+        if (youtubeUrl && this.isValidYoutubeUrl(youtubeUrl)) {
+            const embedUrl = this.getEmbedUrl(youtubeUrl);
+            this.container.innerHTML = `
+                <iframe width="100%" height="500" src="${embedUrl}?autoplay=1&mute=1" 
+                    title="How to Install" frameborder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen>
+                </iframe>
+            `;
+            this.section.style.display = 'block';
+        }
+    }
+
+    isValidYoutubeUrl(url) {
+        return url.includes('youtube.com') || url.includes('youtu.be');
+    }
+
+    getEmbedUrl(url) {
+        let videoId = '';
+        if (url.includes('youtu.be/')) {
+            videoId = url.split('youtu.be/')[1]?.split('?')[0];
+        } else if (url.includes('watch?v=')) {
+            videoId = url.split('watch?v=')[1]?.split('&')[0];
+        }
+        return videoId ? `https://www.youtube.com/embed/${videoId}` : url;
+    }
+}
+
+// ============================================================================
 // INITIALIZATION
 // ============================================================================
 
@@ -626,6 +676,7 @@ document.addEventListener('DOMContentLoaded', () => {
     new SmoothScroll();
     new XPAnimation();
     new ButtonEffects();
+    new InstallVideo();
 
     console.log('🎮 Next Level - AI Fitness Coach initialized');
     console.log('⚔️ Become the Hunter of your fitness goals!');
