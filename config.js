@@ -19,15 +19,14 @@ window.NEXTLEVEL_CONFIG = {
     scriptUrl: 'https://script.google.com/macros/s/AKfycbwXS1Oa0mhBZkBWR15D0Ajz1pL9qugL8YSLlvOG6U4-2Rx96yGwy0Z5FlLUrPa805GC/exec',
 
     // ==========================================================================
-    // DOWNLOAD URL
-    // Paste your download link (Google Drive or direct link)
-    // Example: 'https://drive.google.com/uc?id=YOUR_FILE_ID&export=download'
-    // ==========================================================================
-    downloadUrl: 'https://drive.google.com/uc?id=14JQB153_9GuZv6vYvN3-jG7lQh2H9v8z&export=download',
-
-    // ==========================================================================
     // ADMIN PASSWORD
     // Set your admin password here (used for /admin access)
     // ==========================================================================
-    adminPassword: 'nextlevel2024',  // <-- CHANGE THIS TO YOUR PASSWORD
+    adminPassword: 'nextlevel2024',
+
+    // ==========================================================================
+    // SUPABASE CREDENTIALS
+    // ==========================================================================
+    supabaseUrl: 'https://dsgozmikjqxqzzlopgmy.supabase.co',
+    supabaseKey: 'sb_publishable_j-gNM0N_FzLu-lDK8HlGpw_-RgAlk6u'
 };

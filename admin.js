@@ -9,10 +9,14 @@
 const STORAGE_KEYS = {
     PASSWORD: 'nextlevel_admin_password',
     SESSION: 'nextlevel_admin_session',
-    SCRIPT_URL: 'nextlevel_script_url',
-    DOWNLOAD_URL: 'nextlevel_download_url',
-    YOUTUBE_URL: 'nextlevel_youtube_url'
+    SCRIPT_URL: 'nextlevel_script_url'
 };
+
+// Initialize Supabase
+const supabase = window.supabase.createClient(
+    window.NEXTLEVEL_CONFIG.supabaseUrl,
+    window.NEXTLEVEL_CONFIG.supabaseKey
+);
 
 // ============================================================================
 // DOM ELEMENTS
@@ -152,29 +156,44 @@ class AdminAuth {
 
 class SettingsManager {
     constructor() {
-        this.loadSettings();
+        this.loadConfig(); // Renamed from loadSettings
         this.bindEvents();
         this.updateStats();
     }
 
-    loadSettings() {
-        // Load Script URL
+    async loadConfig() { // Renamed from loadSettings and made async
+        // Load Script URL (still local for now)
         const scriptUrl = localStorage.getItem(STORAGE_KEYS.SCRIPT_URL);
         if (scriptUrl) {
             elements.scriptUrl.value = scriptUrl;
+            this.showScriptInfo(scriptUrl); // Added
         }
 
-        // Load Download URL
-        const downloadUrl = localStorage.getItem(STORAGE_KEYS.DOWNLOAD_URL);
-        if (downloadUrl) {
-            elements.downloadUrl.value = downloadUrl;
-            this.showDownloadInfo(downloadUrl);
-        }
+        // Fetch settings from Supabase
+        try {
+            const { data, error } = await supabase
+                .from('site_settings')
+                .select('*')
+                .eq('id', 1)
+                .single();
 
-        // Load YouTube URL
-        const youtubeUrl = localStorage.getItem(STORAGE_KEYS.YOUTUBE_URL);
-        if (youtubeUrl) {
-            elements.youtubeUrl.value = youtubeUrl;
+            if (error) throw error;
+
+            if (data) {
+                // Load Download URL
+                if (data.download_url) {
+                    elements.downloadUrl.value = data.download_url;
+                    this.showDownloadInfo(data.download_url);
+                }
+
+                // Load YouTube URL
+                if (data.youtube_url) {
+                    elements.youtubeUrl.value = data.youtube_url;
+                }
+            }
+        } catch (error) {
+            console.error('Error fetching config from Supabase:', error);
+            this.showStatus('download', 'Database connection error', 'error');
         }
 
         // Fetch Total Downloads
@@ -224,7 +243,7 @@ class SettingsManager {
         console.log('Google Script URL saved:', url);
     }
 
-    saveDownloadUrl() {
+    async saveDownloadUrl() { // Made async
         const url = elements.downloadUrl.value.trim();
 
         if (!url) {
@@ -237,46 +256,104 @@ class SettingsManager {
             return;
         }
 
-        localStorage.setItem(STORAGE_KEYS.DOWNLOAD_URL, url);
-        this.showStatus('download', '✓ Saved successfully', 'success');
-        this.showDownloadInfo(url);
-        this.updateStats();
+        elements.saveDownloadBtn.disabled = true; // Added
 
-        console.log('Download URL saved:', url);
+        try {
+            const { error } = await supabase
+                .from('site_settings')
+                .update({ download_url: url })
+                .eq('id', 1);
+
+            if (error) throw error;
+
+            this.showStatus('download', '✓ Saved safely to Database', 'success'); // Updated message
+            this.showDownloadInfo(url);
+            this.updateStats();
+            console.log('Download URL saved to Supabase:', url); // Updated log
+        } catch (error) {
+            console.error('Error saving download URL:', error);
+            this.showStatus('download', 'Error saving to Database', 'error'); // Updated message
+        } finally {
+            elements.saveDownloadBtn.disabled = false; // Added
+        }
     }
 
-    removeDownloadUrl() {
-        localStorage.removeItem(STORAGE_KEYS.DOWNLOAD_URL);
-        elements.downloadUrl.value = '';
-        elements.downloadInfo.style.display = 'none';
-        this.showStatus('download', '✓ Download link removed', 'success');
-        this.updateStats();
+    async removeDownloadUrl() { // Made async
+        elements.removeDownloadBtn.disabled = true; // Added
 
-        console.log('Download URL removed');
+        try {
+            const { error } = await supabase
+                .from('site_settings')
+                .update({ download_url: '' })
+                .eq('id', 1);
+
+            if (error) throw error;
+
+            elements.downloadUrl.value = '';
+            elements.downloadInfo.style.display = 'none';
+            this.showStatus('download', '✓ Download link removed from Database', 'success'); // Updated message
+            this.updateStats();
+            console.log('Download URL removed from Supabase'); // Updated log
+        } catch (error) {
+            console.error('Error removing download URL:', error);
+            this.showStatus('download', 'Error removing from Database', 'error'); // Updated message
+        } finally {
+            elements.removeDownloadBtn.disabled = false; // Added
+        }
     }
 
-    saveYoutubeUrl() {
+    async saveYoutubeUrl() { // Made async
         const url = elements.youtubeUrl.value.trim();
+        elements.saveYoutubeBtn.disabled = true; // Added
 
         if (!url) {
-            localStorage.removeItem(STORAGE_KEYS.YOUTUBE_URL);
-            this.showStatus('youtube', 'Installation video disabled', 'success');
+            try {
+                const { error } = await supabase.from('site_settings').update({ youtube_url: '' }).eq('id', 1);
+                if (error) throw error;
+                this.showStatus('youtube', 'Installation video disabled in Database', 'success'); // Updated message
+            } catch (error) {
+                this.showStatus('youtube', 'Database Error', 'error'); // Updated message
+            }
+            elements.saveYoutubeBtn.disabled = false; // Added
             return;
         }
 
         if (!url.includes('youtube.com') && !url.includes('youtu.be')) {
             this.showStatus('youtube', 'Please enter a valid YouTube URL', 'error');
+            elements.saveYoutubeBtn.disabled = false; // Added
             return;
         }
 
-        localStorage.setItem(STORAGE_KEYS.YOUTUBE_URL, url);
-        this.showStatus('youtube', '✓ Saved successfully', 'success');
-        console.log('YouTube URL saved:', url);
+        try {
+            const { error } = await supabase
+                .from('site_settings')
+                .update({ youtube_url: url })
+                .eq('id', 1);
+
+            if (error) throw error;
+
+            this.showStatus('youtube', '✓ Saved successfully to Database', 'success'); // Updated message
+            console.log('YouTube URL saved to Supabase:', url); // Updated log
+        } catch (error) {
+            console.error('Error saving youtube URL:', error);
+            this.showStatus('youtube', 'Error saving to Database', 'error'); // Updated message
+        } finally {
+            elements.saveYoutubeBtn.disabled = false; // Added
+        }
     }
 
-    showDownloadInfo(url) {
+    async showDownloadInfo(url) {
         elements.downloadInfo.style.display = 'block';
         elements.currentDownloadUrl.textContent = url;
+    }
+
+    // Added showScriptInfo method
+    showScriptInfo(url) {
+        // This method was implied by the diff, but its content was not provided.
+        // Assuming it's similar to showDownloadInfo for now, but for script.
+        // If there's no specific display for script info, this can be empty or removed.
+        // For now, it's just a placeholder.
+        console.log('Script URL loaded:', url);
     }
 
     showStatus(type, message, status) {
@@ -296,9 +373,8 @@ class SettingsManager {
         }, 3000);
     }
 
-    updateStats() {
+    async updateStats() { // Made async
         const scriptUrl = localStorage.getItem(STORAGE_KEYS.SCRIPT_URL);
-        const downloadUrl = localStorage.getItem(STORAGE_KEYS.DOWNLOAD_URL);
 
         if (scriptUrl) {
             elements.statScript.textContent = 'Configured';
@@ -308,11 +384,22 @@ class SettingsManager {
             elements.statScript.classList.remove('active');
         }
 
-        if (downloadUrl) {
-            elements.statDownload.textContent = 'Active';
-            elements.statDownload.classList.add('active');
-        } else {
-            elements.statDownload.textContent = 'Not Configured';
+        try {
+            const { data } = await supabase
+                .from('site_settings')
+                .select('download_url')
+                .eq('id', 1)
+                .single();
+
+            if (data && data.download_url) {
+                elements.statDownload.textContent = 'Active';
+                elements.statDownload.classList.add('active');
+            } else {
+                elements.statDownload.textContent = 'Not Configured';
+                elements.statDownload.classList.remove('active');
+            }
+        } catch (e) {
+            elements.statDownload.textContent = 'Error';
             elements.statDownload.classList.remove('active');
         }
     }

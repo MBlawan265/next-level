@@ -427,8 +427,8 @@ class DownloadHandler {
             console.error('Failed to increment download count:', error);
         }
 
-        // Get download URL from localStorage (works on all devices) with fallback to config.js
-        const downloadUrl = localStorage.getItem('nextlevel_download_url') || window.NEXTLEVEL_CONFIG?.downloadUrl;
+        // Get download URL from Supabase with fallback to config.js
+        const downloadUrl = window.NEXTLEVEL_DB?.downloadUrl || window.NEXTLEVEL_CONFIG?.downloadUrl || localStorage.getItem('nextlevel_download_url');
 
         if (downloadUrl && this.isValidUrl(downloadUrl)) {
             // Visual feedback
@@ -482,7 +482,7 @@ class DownloadHandler {
     }
 
     updateButtonStates() {
-        const downloadUrl = localStorage.getItem('nextlevel_download_url') || window.NEXTLEVEL_CONFIG?.downloadUrl;
+        const downloadUrl = window.NEXTLEVEL_DB?.downloadUrl || window.NEXTLEVEL_CONFIG?.downloadUrl || localStorage.getItem('nextlevel_download_url');
         const hasValidUrl = downloadUrl && this.isValidUrl(downloadUrl);
 
         [this.downloadBtn, this.downloadHeroBtn, this.downloadWindowsBtn].forEach(btn => {
@@ -660,7 +660,7 @@ class InstallVideo {
     init() {
         if (!this.section || !this.container) return;
 
-        const youtubeUrl = localStorage.getItem('nextlevel_youtube_url') || window.NEXTLEVEL_CONFIG?.youtubeUrl;
+        const youtubeUrl = window.NEXTLEVEL_DB?.youtubeUrl || window.NEXTLEVEL_CONFIG?.youtubeUrl || localStorage.getItem('nextlevel_youtube_url');
         if (youtubeUrl && this.isValidYoutubeUrl(youtubeUrl)) {
             const embedUrl = this.getEmbedUrl(youtubeUrl);
             this.container.innerHTML = `
@@ -694,19 +694,47 @@ class InstallVideo {
 // ============================================================================
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Initialize all modules
-    new ParticleSystem('particle-canvas');
-    new Navigation();
-    new ScrollReveal();
-    new BetaForm();
-    new DownloadHandler();
-    new SmoothScroll();
-    new XPAnimation();
-    new ButtonEffects();
-    new InstallVideo();
+    // Initialize Supabase
+    const supabase = window.supabase.createClient(
+        window.NEXTLEVEL_CONFIG.supabaseUrl,
+        window.NEXTLEVEL_CONFIG.supabaseKey
+    );
 
-    console.log('🎮 Next Level - AI Fitness Coach initialized');
-    console.log('⚔️ Become the Hunter of your fitness goals!');
+    // Global state for settings
+    window.NEXTLEVEL_DB = {
+        downloadUrl: null,
+        youtubeUrl: null
+    };
+
+    // Fetch settings immediately
+    supabase.from('site_settings').select('*').eq('id', 1).single().then(({ data, error }) => {
+        if (!error && data) {
+            window.NEXTLEVEL_DB.downloadUrl = data.download_url;
+            window.NEXTLEVEL_DB.youtubeUrl = data.youtube_url;
+        }
+
+        // Initialize components after fetching settings
+        initApp();
+    }).catch(err => {
+        console.error("Failed to load global config:", err);
+        // Fallback to init anyway
+        initApp();
+    });
+
+    function initApp() {
+        new ParticleSystem('particle-canvas');
+        new Navigation();
+        new ScrollReveal();
+        new BetaForm();
+        new DownloadHandler();
+        new SmoothScroll();
+        new XPAnimation();
+        new ButtonEffects();
+        new InstallVideo();
+
+        console.log('🎮 Next Level - AI Fitness Coach initialized');
+        console.log('⚔️ Become the Hunter of your fitness goals!');
+    }
 });
 
 // ============================================================================
