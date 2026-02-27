@@ -427,8 +427,8 @@ class DownloadHandler {
             console.error('Failed to increment download count:', error);
         }
 
-        // Get download URL from config (works on all devices)
-        const downloadUrl = window.NEXTLEVEL_CONFIG?.downloadUrl || localStorage.getItem('nextlevel_download_url');
+        // Get download URL from localStorage (works on all devices) with fallback to config.js
+        const downloadUrl = localStorage.getItem('nextlevel_download_url') || window.NEXTLEVEL_CONFIG?.downloadUrl;
 
         if (downloadUrl && this.isValidUrl(downloadUrl)) {
             // Visual feedback
@@ -482,7 +482,7 @@ class DownloadHandler {
     }
 
     updateButtonStates() {
-        const downloadUrl = window.NEXTLEVEL_CONFIG?.downloadUrl || localStorage.getItem('nextlevel_download_url');
+        const downloadUrl = localStorage.getItem('nextlevel_download_url') || window.NEXTLEVEL_CONFIG?.downloadUrl;
         const hasValidUrl = downloadUrl && this.isValidUrl(downloadUrl);
 
         [this.downloadBtn, this.downloadHeroBtn, this.downloadWindowsBtn].forEach(btn => {
@@ -660,7 +660,7 @@ class InstallVideo {
     init() {
         if (!this.section || !this.container) return;
 
-        const youtubeUrl = window.NEXTLEVEL_CONFIG?.youtubeUrl || localStorage.getItem('nextlevel_youtube_url');
+        const youtubeUrl = localStorage.getItem('nextlevel_youtube_url') || window.NEXTLEVEL_CONFIG?.youtubeUrl;
         if (youtubeUrl && this.isValidYoutubeUrl(youtubeUrl)) {
             const embedUrl = this.getEmbedUrl(youtubeUrl);
             this.container.innerHTML = `

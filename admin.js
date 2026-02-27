@@ -322,16 +322,16 @@ class SettingsManager {
 
         try {
             const response = await fetch('https://api.counterapi.dev/v1/nextlevelfitness/downloads');
-            const data = await response.json();
 
-            if (data && data.count !== undefined) {
-                elements.statDownloadCount.textContent = data.count.toLocaleString();
+            if (response.ok) {
+                const data = await response.json();
+                elements.statDownloadCount.textContent = (data && data.count) ? data.count.toLocaleString() : '0';
             } else {
                 elements.statDownloadCount.textContent = '0';
             }
         } catch (error) {
             console.error('Error fetching download count:', error);
-            elements.statDownloadCount.textContent = 'Error';
+            elements.statDownloadCount.textContent = 'Unavailable';
         }
     }
 
