@@ -94,10 +94,13 @@ class AdminAuth {
 
     bindEvents() {
         // Login
-        elements.loginBtn?.addEventListener('click', () => this.handleLogin());
+        elements.loginBtn?.addEventListener('click', (e) => this.handleLogin(e));
 
         const triggerLogin = (e) => {
-            if (e.key === 'Enter') this.handleLogin();
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                this.handleLogin(e);
+            }
         };
 
         elements.adminId?.addEventListener('keypress', triggerLogin);
@@ -107,7 +110,9 @@ class AdminAuth {
         elements.logoutBtn?.addEventListener('click', () => this.handleLogout());
     }
 
-    handleLogin() {
+    handleLogin(e) {
+        if (e) e.preventDefault();
+
         const inputId = elements.adminId.value;
         const inputPass = elements.password.value;
 
@@ -164,9 +169,8 @@ class SettingsManager {
     async loadConfig() { // Renamed from loadSettings and made async
         // Load Script URL (still local for now)
         const scriptUrl = localStorage.getItem(STORAGE_KEYS.SCRIPT_URL);
-        if (scriptUrl) {
+        if (elements.scriptUrl && scriptUrl) {
             elements.scriptUrl.value = scriptUrl;
-            this.showScriptInfo(scriptUrl); // Added
         }
 
         // Fetch settings from Supabase
@@ -349,10 +353,7 @@ class SettingsManager {
 
     // Added showScriptInfo method
     showScriptInfo(url) {
-        // This method was implied by the diff, but its content was not provided.
-        // Assuming it's similar to showDownloadInfo for now, but for script.
-        // If there's no specific display for script info, this can be empty or removed.
-        // For now, it's just a placeholder.
+        if (!elements.scriptStatus) return;
         console.log('Script URL loaded:', url);
     }
 
@@ -376,12 +377,14 @@ class SettingsManager {
     async updateStats() { // Made async
         const scriptUrl = localStorage.getItem(STORAGE_KEYS.SCRIPT_URL);
 
-        if (scriptUrl) {
-            elements.statScript.textContent = 'Configured';
-            elements.statScript.classList.add('active');
-        } else {
-            elements.statScript.textContent = 'Not Configured';
-            elements.statScript.classList.remove('active');
+        if (elements.statScript) {
+            if (scriptUrl) {
+                elements.statScript.textContent = 'Configured';
+                elements.statScript.classList.add('active');
+            } else {
+                elements.statScript.textContent = 'Not Configured';
+                elements.statScript.classList.remove('active');
+            }
         }
 
         try {
