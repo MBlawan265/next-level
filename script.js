@@ -360,6 +360,11 @@ class DownloadHandler {
         this.downloadHeroBtn = document.getElementById('download-hero-btn');
         this.downloadWindowsBtn = document.getElementById('download-windows-btn');
 
+        // OS Alert Modal elements
+        this.osAlertModal = document.getElementById('os-alert-modal');
+        this.osAlertClose = document.getElementById('os-alert-close');
+        this.osAlertOk = document.getElementById('os-alert-ok');
+
         this.init();
     }
 
@@ -381,6 +386,23 @@ class DownloadHandler {
 
         // Update button states on load
         this.updateButtonStates();
+
+        // Setup OS Alert Modal listeners
+        if (this.osAlertModal) {
+            const closeModal = () => {
+                this.osAlertModal.classList.remove('active');
+            };
+
+            if (this.osAlertClose) this.osAlertClose.addEventListener('click', closeModal);
+            if (this.osAlertOk) this.osAlertOk.addEventListener('click', closeModal);
+
+            // Close on overlay click
+            this.osAlertModal.addEventListener('click', (e) => {
+                if (e.target === this.osAlertModal) {
+                    closeModal();
+                }
+            });
+        }
     }
 
     setupButton(button) {
@@ -441,8 +463,13 @@ class DownloadHandler {
             }, 3000);
         }
 
-        // Also show an alert for clarity
-        alert('The Android, iOS, and macOS versions are not available yet. The app is currently only available for Windows PC.');
+        // Show the custom modal instead of native alert
+        if (this.osAlertModal) {
+            this.osAlertModal.classList.add('active');
+        } else {
+            // Fallback just in case
+            alert('The Android, iOS, and macOS versions are not available yet. The app is currently only available for Windows PC.');
+        }
     }
 
     isValidUrl(string) {
