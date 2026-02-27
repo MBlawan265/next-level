@@ -28,14 +28,13 @@
             <div class="login-form" id="auth-form">
                 <h2 class="form-title">Login</h2>
                 <div class="input-group">
-                    <input type="email" id="admin-email" class="admin-input" placeholder="Enter Admin Email" required
-                        autocomplete="email">
+                    <input type="text" id="admin-id" class="admin-input" placeholder="Enter Admin ID" required
+                        autocomplete="off">
                 </div>
                 <div class="input-group">
-                    <input type="password" id="admin-password" class="admin-input" placeholder="Enter password"
-                        required>
+                    <input type="password" id="password" class="admin-input" placeholder="Enter password" required>
                 </div>
-                <button type="button" class="btn btn-primary btn-full" id="login-btn" onclick="loginAdmin()">
+                <button type="button" class="btn btn-primary btn-full" id="login-btn">
                     Login
                 </button>
                 <p class="form-error" id="login-error"></p>
@@ -248,10 +247,9 @@ function doGet(e) {
         <footer class="admin-footer">
             <p>Next Level Admin Dashboard • Manage with care 🎮</p>
         </footer>
+    </div>
 
-        <!-- Main JavaScript -->
-        <script type="module" src="config.js"></script>
-        <script type="module" src="admin.js"></script>
+    <script src="admin.js"></script>
 </body>
 
 </html>
