@@ -1064,6 +1064,7 @@ button {
 
 .gallery-slider {
     display: flex;
+    align-items: center;
     overflow-x: auto;
     scroll-snap-type: x mandatory;
     scroll-behavior: smooth;
@@ -1108,8 +1109,6 @@ button {
 .device-screen {
     background: var(--color-bg-tertiary);
     border-radius: var(--radius-md);
-    aspect-ratio: 9 / 19.5;
-    /* Phone aspect ratio typical for screenshots */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1118,9 +1117,7 @@ button {
 
 .gallery-img {
     width: 100%;
-    height: 100%;
-    object-fit: contain;
-    /* Prevent cropping UI screenshots */
+    height: auto;
     display: block;
     transition: var(--transition-normal);
 }
