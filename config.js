@@ -2,9 +2,8 @@
    NEXT LEVEL - CONFIGURATION
    ========================================================================== */
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'YOUR_SUPABASE_URL';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'YOUR_SUPABASE_ANON_KEY';
-const supabaseServiceKey = import.meta.env.VITE_SUPABASE_SERVICE_KEY || 'YOUR_SUPABASE_SERVICE_KEY';
+const supabaseUrl = 'https://dsgozmikjqxqzzlopgmy.supabase.co';
+const supabaseAnonKey = 'sb_publishable_j-gNM0N_FzLu-lDK8HlGpw_-RgAlk6u';
 
 // Create a single Supabase client for all scripts to use
 // window.supabase is expected to be loaded via CDN script tag
@@ -17,6 +16,5 @@ window.NEXTLEVEL_CONFIG = {
     downloadUrl: 'https://github.com/Sharkolle/Next-level-fitness/releases/download/v1.0.0/NextLevel-Fitness.zip',
     adminPassword: 'nextlevel2024',
     supabaseUrl: supabaseUrl,
-    supabaseKey: supabaseAnonKey,
-    supabaseServiceKey: supabaseServiceKey
+    supabaseKey: supabaseAnonKey
 };

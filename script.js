@@ -694,29 +694,14 @@ class InstallVideo {
 // ============================================================================
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Initialize Supabase
-    const supabase = window.supabaseClient;
-
-    // Global state for settings
+    // Global state for settings (check localStorage first)
     window.NEXTLEVEL_DB = {
-        downloadUrl: null,
-        youtubeUrl: null
+        downloadUrl: localStorage.getItem('nextlevel_download_url') || null,
+        youtubeUrl: localStorage.getItem('nextlevel_youtube_url') || null
     };
 
-    // Fetch settings immediately
-    supabase.from('site_settings').select('*').eq('id', 1).single().then(({ data, error }) => {
-        if (!error && data) {
-            window.NEXTLEVEL_DB.downloadUrl = data.download_url;
-            window.NEXTLEVEL_DB.youtubeUrl = data.youtube_url;
-        }
-
-        // Initialize components after fetching settings
-        initApp();
-    }).catch(err => {
-        console.error("Failed to load global config:", err);
-        // Fallback to init anyway
-        initApp();
-    });
+    // Initialize components
+    initApp();
 
     function initApp() {
         new ParticleSystem('particle-canvas');
