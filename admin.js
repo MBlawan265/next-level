@@ -24,7 +24,7 @@ const elements = {
     loginScreen: document.getElementById('login-screen'),
     authForm: document.getElementById('auth-form'),
     adminEmail: document.getElementById('admin-email'),
-    password: document.getElementById('password'),
+    password: document.getElementById('admin-password'),
     loginBtn: document.getElementById('login-btn'),
     loginError: document.getElementById('login-error'),
 
@@ -70,7 +70,7 @@ window.loginAdmin = async function () {
     const email = elements.adminEmail.value;
     const password = elements.password.value;
 
-    const { data, error } = await window.supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password
     });
@@ -95,7 +95,7 @@ window.loginAdmin = async function () {
 };
 
 window.logoutAdmin = async function () {
-    await window.supabase.auth.signOut();
+    await supabase.auth.signOut();
     sessionStorage.removeItem(STORAGE_KEYS.SESSION);
     elements.dashboard.style.display = 'none';
     elements.loginScreen.style.display = 'flex';
