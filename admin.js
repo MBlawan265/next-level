@@ -13,7 +13,7 @@ const STORAGE_KEYS = {
 };
 
 // Initialize Supabase from window (set in config.js)
-const supabase = window.supabaseClient;
+const dbClient = window.supabaseClient;
 
 // ============================================================================
 // DOM ELEMENTS
@@ -96,7 +96,7 @@ window.loginAdmin = async function () {
 
 window.logoutAdmin = async function () {
     try {
-        await supabase.auth.signOut();
+        await dbClient.auth.signOut();
     } catch (e) { } // Attempt to log out of supabase if there was a leftover session, ignore errors
 
     sessionStorage.removeItem(STORAGE_KEYS.SESSION);
@@ -147,7 +147,7 @@ class SettingsManager {
 
         // Fetch settings from Supabase
         try {
-            const { data, error } = await supabase
+            const { data, error } = await dbClient
                 .from('site_settings')
                 .select('*')
                 .eq('id', 1)
@@ -235,7 +235,7 @@ class SettingsManager {
         elements.saveDownloadBtn.disabled = true; // Added
 
         try {
-            const { error } = await supabase
+            const { error } = await dbClient
                 .from('site_settings')
                 .update({ download_url: url })
                 .eq('id', 1);
@@ -258,7 +258,7 @@ class SettingsManager {
         elements.removeDownloadBtn.disabled = true; // Added
 
         try {
-            const { error } = await supabase
+            const { error } = await dbClient
                 .from('site_settings')
                 .update({ download_url: '' })
                 .eq('id', 1);
@@ -284,7 +284,7 @@ class SettingsManager {
 
         if (!url) {
             try {
-                const { error } = await supabase.from('site_settings').update({ youtube_url: '' }).eq('id', 1);
+                const { error } = await dbClient.from('site_settings').update({ youtube_url: '' }).eq('id', 1);
                 if (error) throw error;
                 this.showStatus('youtube', 'Installation video disabled in Database', 'success'); // Updated message
             } catch (error) {
@@ -301,7 +301,7 @@ class SettingsManager {
         }
 
         try {
-            const { error } = await supabase
+            const { error } = await dbClient
                 .from('site_settings')
                 .update({ youtube_url: url })
                 .eq('id', 1);
@@ -360,7 +360,7 @@ class SettingsManager {
         }
 
         try {
-            const { data } = await supabase
+            const { data } = await dbClient
                 .from('site_settings')
                 .select('download_url')
                 .eq('id', 1)
