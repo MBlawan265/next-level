@@ -23,7 +23,7 @@ const elements = {
     // Login
     loginScreen: document.getElementById('login-screen'),
     authForm: document.getElementById('auth-form'),
-    adminEmail: document.getElementById('admin-email'),
+    adminId: document.getElementById('admin-id'),
     password: document.getElementById('admin-password'),
     loginBtn: document.getElementById('login-btn'),
     loginError: document.getElementById('login-error'),
@@ -67,23 +67,23 @@ const elements = {
 
 // Global login function expected by HTML onclick
 window.loginAdmin = async function () {
-    const email = elements.adminEmail.value;
+    const adminId = elements.adminId.value;
     const password = elements.password.value;
 
-    const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password
-    });
+    const expectedId = 'PROJECT-SHARKOLLE';
+    const expectedPassword = 'Amir@2015';
 
-    if (error) {
-        console.error("Login failed:", error);
-        alert(error.message);
+    if (adminId !== expectedId || password !== expectedPassword) {
+        if (elements.loginError) {
+            elements.loginError.textContent = "Invalid Admin ID or Password";
+            setTimeout(() => { elements.loginError.textContent = ''; }, 3000);
+        }
         return;
     }
 
     // Success: store session flag and show dashboard
     sessionStorage.setItem(STORAGE_KEYS.SESSION, 'true');
-    elements.adminEmail.value = '';
+    elements.adminId.value = '';
     elements.password.value = '';
 
     // Switch UI manually as it's an SPA
@@ -95,11 +95,14 @@ window.loginAdmin = async function () {
 };
 
 window.logoutAdmin = async function () {
-    await supabase.auth.signOut();
+    try {
+        await supabase.auth.signOut();
+    } catch (e) { } // Attempt to log out of supabase if there was a leftover session, ignore errors
+
     sessionStorage.removeItem(STORAGE_KEYS.SESSION);
     elements.dashboard.style.display = 'none';
     elements.loginScreen.style.display = 'flex';
-    if (elements.adminEmail) elements.adminEmail.value = '';
+    if (elements.adminId) elements.adminId.value = '';
     if (elements.password) elements.password.value = '';
 };
 
