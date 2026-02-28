@@ -695,10 +695,7 @@ class InstallVideo {
 
 document.addEventListener('DOMContentLoaded', () => {
     // Initialize Supabase
-    const supabase = window.supabase.createClient(
-        window.NEXTLEVEL_CONFIG.supabaseUrl,
-        window.NEXTLEVEL_CONFIG.supabaseKey
-    );
+    const supabase = window.supabaseClient;
 
     // Global state for settings
     window.NEXTLEVEL_DB = {

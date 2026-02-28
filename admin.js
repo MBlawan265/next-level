@@ -13,7 +13,7 @@ const STORAGE_KEYS = {
 };
 
 // Initialize Supabase from window (set in config.js)
-const supabase = window.supabase;
+const supabase = window.supabaseClient;
 
 // ============================================================================
 // DOM ELEMENTS
