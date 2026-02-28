@@ -10,6 +10,7 @@ window.supabaseClient = window.supabase.createClient(supabaseUrl, supabaseAnonKe
 
 window.NEXTLEVEL_CONFIG = {
     scriptUrl: 'https://script.google.com/macros/s/AKfycbwXS1Oa0mhBZkBWR15D0Ajz1pL9qugL8YSLlvOG6U4-2Rx96yGwy0Z5FlLUrPa805GC/exec',
+    downloadUrl: 'https://github.com/Sharkolle/Next-level-fitness/releases/download/v1.0.0/NextLevel-Fitness.zip',
     adminPassword: 'nextlevel2024',
     supabaseUrl: supabaseUrl,
     supabaseKey: supabaseAnonKey
