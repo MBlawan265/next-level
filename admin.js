@@ -12,8 +12,11 @@ const STORAGE_KEYS = {
     SCRIPT_URL: 'nextlevel_script_url'
 };
 
-// Initialize Supabase from window (set in config.js)
-const dbClient = window.supabaseClient;
+// Initialize Admin-Level Supabase Client (bypasses RLS)
+const dbClient = window.supabase.createClient(
+    window.NEXTLEVEL_CONFIG.supabaseUrl,
+    window.NEXTLEVEL_CONFIG.supabaseServiceKey
+);
 
 // ============================================================================
 // DOM ELEMENTS
