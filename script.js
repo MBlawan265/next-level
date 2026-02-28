@@ -647,6 +647,112 @@ rippleStyles.textContent = `
 document.head.appendChild(rippleStyles);
 
 // ============================================================================
+// SCREENSHOT SLIDER
+// ============================================================================
+
+class ScreenshotSlider {
+    constructor() {
+        this.slider = document.getElementById('gallery-slider');
+        this.prevBtn = document.getElementById('gallery-prev');
+        this.nextBtn = document.getElementById('gallery-next');
+        this.dotsContainer = document.getElementById('gallery-dots');
+
+        if (!this.slider) return;
+
+        this.items = Array.from(this.slider.querySelectorAll('.gallery-item'));
+        this.currentIndex = 0;
+
+        this.init();
+    }
+
+    init() {
+        this.createDots();
+        this.bindEvents();
+        this.updateDots();
+
+        // Auto slide every 5 seconds
+        this.autoSlideInterval = setInterval(() => this.slideNext(), 5000);
+
+        // Pause on hover
+        this.slider.addEventListener('mouseenter', () => clearInterval(this.autoSlideInterval));
+        this.slider.addEventListener('mouseleave', () => {
+            this.autoSlideInterval = setInterval(() => this.slideNext(), 5000);
+        });
+    }
+
+    createDots() {
+        if (!this.dotsContainer) return;
+
+        this.items.forEach((_, index) => {
+            const dot = document.createElement('div');
+            dot.classList.add('dot');
+            dot.addEventListener('click', () => this.goToSlide(index));
+            this.dotsContainer.appendChild(dot);
+        });
+    }
+
+    bindEvents() {
+        if (this.prevBtn) this.prevBtn.addEventListener('click', () => this.slidePrev());
+        if (this.nextBtn) this.nextBtn.addEventListener('click', () => this.slideNext());
+
+        // Update active dot on scroll
+        this.slider.addEventListener('scroll', () => {
+            // Find which item is closest to the center
+            const scrollLeft = this.slider.scrollLeft;
+            const itemWidth = this.items[0].offsetWidth;
+            const newIndex = Math.round(scrollLeft / itemWidth);
+
+            if (newIndex !== this.currentIndex && newIndex >= 0 && newIndex < this.items.length) {
+                this.currentIndex = newIndex;
+                this.updateDots();
+            }
+        });
+    }
+
+    slideNext() {
+        if (this.currentIndex < this.items.length - 1) {
+            this.goToSlide(this.currentIndex + 1);
+        } else {
+            this.goToSlide(0); // Loop back
+        }
+    }
+
+    slidePrev() {
+        if (this.currentIndex > 0) {
+            this.goToSlide(this.currentIndex - 1);
+        } else {
+            this.goToSlide(this.items.length - 1); // Loop to end
+        }
+    }
+
+    goToSlide(index) {
+        this.currentIndex = index;
+        const itemWidth = this.items[0].offsetWidth;
+        const gap = parseInt(window.getComputedStyle(this.slider).gap) || 0;
+
+        this.slider.scrollTo({
+            left: index * (itemWidth + gap),
+            behavior: 'smooth'
+        });
+
+        this.updateDots();
+    }
+
+    updateDots() {
+        if (!this.dotsContainer) return;
+
+        const dots = this.dotsContainer.querySelectorAll('.dot');
+        dots.forEach((dot, index) => {
+            if (index === this.currentIndex) {
+                dot.classList.add('active');
+            } else {
+                dot.classList.remove('active');
+            }
+        });
+    }
+}
+
+// ============================================================================
 // INSTALL VIDEO HANDLER
 // ============================================================================
 
@@ -713,6 +819,7 @@ document.addEventListener('DOMContentLoaded', () => {
         new XPAnimation();
         new ButtonEffects();
         new InstallVideo();
+        new ScreenshotSlider();
 
         console.log('🎮 Next Level - AI Fitness Coach initialized');
         console.log('⚔️ Become the Hunter of your fitness goals!');

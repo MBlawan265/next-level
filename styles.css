@@ -1062,13 +1062,28 @@ button {
     z-index: 2;
 }
 
-.gallery-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+.gallery-slider {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
     gap: var(--space-xl);
+    padding: var(--space-md) 0 var(--space-xl) 0;
+
+    /* Hide scrollbar */
+    scrollbar-width: none;
+    /* Firefox */
+}
+
+.gallery-slider::-webkit-scrollbar {
+    display: none;
+    /* Chrome/Safari */
 }
 
 .gallery-item {
+    flex: 0 0 85%;
+    max-width: 350px;
+    scroll-snap-align: center;
     transition: var(--transition-normal);
 }
 
@@ -1093,7 +1108,8 @@ button {
 .device-screen {
     background: var(--color-bg-tertiary);
     border-radius: var(--radius-md);
-    aspect-ratio: 4 / 3;
+    aspect-ratio: 9 / 19.5;
+    /* Phone aspect ratio typical for screenshots */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1103,13 +1119,64 @@ button {
 .gallery-img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
+    /* Prevent cropping UI screenshots */
     display: block;
     transition: var(--transition-normal);
 }
 
 .gallery-item:hover .gallery-img {
-    transform: scale(1.05);
+    transform: scale(1.02);
+}
+
+.slider-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: var(--space-lg);
+    margin-top: var(--space-md);
+}
+
+.slider-btn {
+    background: transparent;
+    border: 2px solid var(--color-neon-blue);
+    color: var(--color-neon-blue);
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: var(--transition-normal);
+    box-shadow: 0 0 10px rgba(0, 175, 255, 0.2);
+}
+
+.slider-btn:hover {
+    background: rgba(0, 175, 255, 0.1);
+    box-shadow: var(--shadow-neon);
+    transform: scale(1.1);
+}
+
+.slider-dots {
+    display: flex;
+    gap: var(--space-xs);
+}
+
+.dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(0, 175, 255, 0.3);
+    cursor: pointer;
+    transition: var(--transition-fast);
+}
+
+.dot.active {
+    background: var(--color-neon-blue);
+    box-shadow: 0 0 10px var(--color-neon-glow);
+    transform: scale(1.2);
 }
 
 .placeholder-content {
