@@ -820,11 +820,168 @@ document.addEventListener('DOMContentLoaded', () => {
         new ButtonEffects();
         new InstallVideo();
         new ScreenshotSlider();
+        new FeedbackManager();
 
         console.log('🎮 Next Level - AI Fitness Coach initialized');
         console.log('⚔️ Become the Hunter of your fitness goals!');
     }
 });
+
+// ============================================================================
+// FEEDBACK MANAGER
+// ============================================================================
+
+class FeedbackManager {
+    constructor() {
+        this.form = document.getElementById('user-feedback-form');
+        this.nameInput = document.getElementById('feedback-name');
+        this.emailInput = document.getElementById('feedback-email');
+        this.typeSelect = document.getElementById('feedback-type');
+        this.messageInput = document.getElementById('feedback-message');
+        this.submitBtn = document.getElementById('feedback-submit-btn');
+        this.statusMsg = document.getElementById('feedback-status-msg');
+        this.feedbackList = document.getElementById('feedback-list');
+
+        if (this.form && this.feedbackList) {
+            this.init();
+        }
+    }
+
+    init() {
+        this.form.addEventListener('submit', (e) => this.handleSubmit(e));
+        this.fetchFeedbacks();
+    }
+
+    async handleSubmit(e) {
+        e.preventDefault();
+
+        const name = this.nameInput.value.trim();
+        const email = this.emailInput.value.trim();
+        const type = this.typeSelect.value;
+        const message = this.messageInput.value.trim();
+
+        if (!name || !email || !type || !message) {
+            this.showStatus('Please fill all fields', 'error');
+            return;
+        }
+
+        this.setLoading(true);
+
+        try {
+            if (!window.supabaseClient) {
+                throw new Error("Supabase client not initialized.");
+            }
+
+            const { data, error } = await window.supabaseClient
+                .from('feedbacks')
+                .insert([{ name, email, type, message }]);
+
+            if (error) throw error;
+
+            this.showStatus('Signal transmitted successfully! Awaiting response.', 'success');
+            this.form.reset();
+        } catch (err) {
+            console.error('Error submitting feedback:', err);
+            this.showStatus('Failed to transmit signal. Try again later.', 'error');
+        } finally {
+            this.setLoading(false);
+        }
+    }
+
+    async fetchFeedbacks() {
+        try {
+            if (!window.supabaseClient) {
+                this.feedbackList.innerHTML = '<div class="feedback-loading">Database connection failed.</div>';
+                return;
+            }
+
+            // Fetch feedbacks that have a reply
+            const { data, error } = await window.supabaseClient
+                .from('feedbacks')
+                .select('*')
+                .not('reply', 'is', null)
+                .order('created_at', { ascending: false })
+                .limit(20);
+
+            if (error) throw error;
+
+            if (data && data.length > 0) {
+                this.renderFeedbacks(data);
+            } else {
+                this.feedbackList.innerHTML = '<div class="feedback-loading">No records found. Be the first to report!</div>';
+            }
+        } catch (err) {
+            console.error('Error fetching feedbacks:', err);
+            this.feedbackList.innerHTML = '<div class="feedback-loading">Error loading records.</div>';
+        }
+    }
+
+    renderFeedbacks(feedbacks) {
+        this.feedbackList.innerHTML = '';
+        feedbacks.forEach(item => {
+            const date = new Date(item.created_at).toLocaleDateString();
+            const safeName = this.escapeHTML(item.name);
+            const safeMessage = this.escapeHTML(item.message);
+            const safeReply = this.escapeHTML(item.reply);
+
+            const card = document.createElement('div');
+            card.className = 'feedback-card';
+            card.innerHTML = `
+                <div class="feedback-header">
+                    <div class="feedback-hunter">
+                        <span class="hunter-name">${safeName}</span>
+                        <span class="feedback-type type-${item.type}">${item.type}</span>
+                    </div>
+                    <span class="feedback-date">${date}</span>
+                </div>
+                <div class="feedback-text">${safeMessage}</div>
+                <div class="feedback-reply">
+                    <div class="reply-header">
+                        <span class="admin-badge">ADMIN</span>
+                    </div>
+                    <div class="reply-text">${safeReply}</div>
+                </div>
+            `;
+            this.feedbackList.appendChild(card);
+        });
+    }
+
+    escapeHTML(str) {
+        if (!str) return '';
+        return str.replace(/[&<>'"]/g, tag => ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            "'": '&#39;',
+            '"': '&quot;'
+        }[tag]));
+    }
+
+    setLoading(loading) {
+        const btnText = this.submitBtn.querySelector('.btn-text');
+        const btnLoading = this.submitBtn.querySelector('.btn-loading');
+
+        if (loading) {
+            btnText.style.display = 'none';
+            btnLoading.style.display = 'inline';
+            this.submitBtn.disabled = true;
+        } else {
+            btnText.style.display = 'inline';
+            btnLoading.style.display = 'none';
+            this.submitBtn.disabled = false;
+        }
+    }
+
+    showStatus(message, type) {
+        this.statusMsg.textContent = message;
+        this.statusMsg.className = 'form-feedback ' + type;
+
+        setTimeout(() => {
+            this.statusMsg.className = 'form-feedback';
+            this.statusMsg.textContent = '';
+        }, 5000);
+    }
+}
 
 // ============================================================================
 // UTILITY: Check if user is on admin page

@@ -496,7 +496,65 @@
         </div>
     </section>
 
+    <!-- Feedback Section -->
+    <section class="feedback" id="feedback">
+        <div class="container">
+            <h2 class="section-title">
+                <span class="title-accent">Community</span> Board
+            </h2>
+            <div class="feedback-container" data-reveal>
 
+                <!-- Feedback Display Area -->
+                <div class="feedback-display">
+                    <h3 class="feedback-subtitle">Recent Logs</h3>
+                    <div class="feedback-list" id="feedback-list">
+                        <!-- Feedbacks injected via JS -->
+                        <div class="feedback-loading">
+                            <span class="pulse-dot"></span> Loading hunter records...
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feedback Form Area -->
+                <div class="feedback-form-area">
+                    <h3 class="feedback-subtitle">Submit Report</h3>
+                    <p class="feedback-desc">Share your experience, suggest a feature, or ask the developers a question.
+                    </p>
+                    <form class="beta-form" id="user-feedback-form">
+                        <div class="input-group">
+                            <input type="text" id="feedback-name" class="neon-input" placeholder="Hunter Name" required>
+                            <div class="input-glow"></div>
+                        </div>
+                        <div class="input-group">
+                            <input type="email" id="feedback-email" class="neon-input"
+                                placeholder="Network Address (Email)" required>
+                            <div class="input-glow"></div>
+                        </div>
+                        <div class="input-group">
+                            <select id="feedback-type" class="neon-input neon-select" required>
+                                <option value="" disabled selected>Select Report Type</option>
+                                <option value="review">Review</option>
+                                <option value="suggestion">Suggestion</option>
+                                <option value="question">Question</option>
+                            </select>
+                            <div class="input-glow"></div>
+                        </div>
+                        <div class="input-group">
+                            <textarea id="feedback-message" class="neon-input neon-textarea" rows="4"
+                                placeholder="Enter your message..." required></textarea>
+                            <div class="input-glow"></div>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-submit" id="feedback-submit-btn">
+                            <span class="btn-text">Transmit Signal</span>
+                            <span class="btn-loading" style="display: none;">Sending...</span>
+                        </button>
+                        <div class="form-feedback" id="feedback-status-msg"></div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </section>
 
     <!-- Community Section -->
     <section class="community" id="community">
@@ -521,7 +579,7 @@
                     </svg>
                     <span class="social-name">GitHub</span>
                 </a>
-                <a href="https://www.reddit.com/user/Economy_Novel6359/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button"
+                <a href="https://www.reddit.com/user/Next-level-fitness/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button"
                     target="_blank" rel="noopener" class="social-link" aria-label="Reddit">
                     <svg viewBox="0 0 24 24" class="social-icon">
                         <path fill="currentColor"

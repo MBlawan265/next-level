@@ -434,6 +434,104 @@
 }
 
 /* --------------------------------------------------------------------------
+   ADMIN FEEDBACK SECTION
+   -------------------------------------------------------------------------- */
+.admin-feedback-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    max-height: 600px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+.admin-feedback-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.admin-feedback-list::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+
+.admin-feedback-list::-webkit-scrollbar-thumb {
+    background: rgba(0, 175, 255, 0.3);
+    border-radius: 10px;
+}
+
+.admin-feedback-card {
+    background: var(--color-bg-tertiary);
+    border: 1px solid rgba(0, 175, 255, 0.2);
+    border-radius: var(--radius-md);
+    padding: var(--space-md);
+}
+
+.admin-feedback-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-sm);
+}
+
+.af-user {
+    font-weight: 600;
+    color: var(--color-text-primary);
+}
+
+.af-email {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    margin-left: 10px;
+}
+
+.af-type {
+    font-size: 0.7rem;
+    padding: 2px 8px;
+    border-radius: 12px;
+    text-transform: uppercase;
+    font-weight: 700;
+}
+
+.af-type.review {
+    background: rgba(0, 175, 255, 0.1);
+    color: var(--color-neon-blue);
+    border: 1px solid rgba(0, 175, 255, 0.3);
+}
+
+.af-type.suggestion {
+    background: rgba(0, 255, 175, 0.1);
+    color: #00ffaf;
+    border: 1px solid rgba(0, 255, 175, 0.3);
+}
+
+.af-type.question {
+    background: rgba(255, 175, 0, 0.1);
+    color: #ffaf00;
+    border: 1px solid rgba(255, 175, 0, 0.3);
+}
+
+.admin-feedback-msg {
+    color: var(--color-text-secondary);
+    font-size: 0.95rem;
+    background: rgba(0, 0, 0, 0.2);
+    padding: var(--space-sm);
+    border-radius: var(--radius-sm);
+    margin-bottom: var(--space-md);
+    line-height: 1.5;
+}
+
+.admin-feedback-reply-area {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.af-reply-input {
+    resize: vertical;
+    min-height: 80px;
+}
+
+/* --------------------------------------------------------------------------
    ADMIN FOOTER
    -------------------------------------------------------------------------- */
 .admin-footer {

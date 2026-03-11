@@ -98,6 +98,7 @@ window.loginAdmin = async function () {
 
     // Initialize Dashboard after login
     new SettingsManager();
+    new FeedbackAdminManager();
 };
 
 window.logoutAdmin = async function () {
@@ -126,6 +127,7 @@ function checkExistingSession() {
         elements.loginScreen.style.display = 'none';
         elements.dashboard.style.display = 'block';
         new SettingsManager();
+        new FeedbackAdminManager();
     }
 }
 
@@ -337,10 +339,145 @@ class SettingsManager {
 }
 
 // ============================================================================
+// FEEDBACK ADMIN MANAGER
+// ============================================================================
+
+class FeedbackAdminManager {
+    constructor() {
+        this.listArea = document.getElementById('admin-feedback-list');
+        this.refreshBtn = document.getElementById('refresh-feedback-btn');
+
+        if (this.listArea) {
+            this.init();
+        }
+    }
+
+    init() {
+        if (this.refreshBtn) {
+            this.refreshBtn.addEventListener('click', () => this.fetchFeedbacks());
+        }
+        this.fetchFeedbacks();
+    }
+
+    async fetchFeedbacks() {
+        this.listArea.innerHTML = '<div class="status-badge">Loading incoming signals...</div>';
+
+        try {
+            if (!dbClient) {
+                this.listArea.innerHTML = '<div class="status-badge error">Supabase client error.</div>';
+                return;
+            }
+
+            const { data, error } = await dbClient
+                .from('feedbacks')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (error) throw error;
+
+            if (data && data.length > 0) {
+                this.renderFeedbacks(data);
+            } else {
+                this.listArea.innerHTML = '<div class="status-badge">No signals received yet.</div>';
+            }
+        } catch (err) {
+            console.error('Error fetching feedbacks:', err);
+            this.listArea.innerHTML = '<div class="status-badge error">Failed to load signals.</div>';
+        }
+    }
+
+    renderFeedbacks(feedbacks) {
+        this.listArea.innerHTML = '';
+        feedbacks.forEach(item => {
+            const date = new Date(item.created_at).toLocaleDateString();
+            const safeName = this.escapeHTML(item.name);
+            const safeEmail = this.escapeHTML(item.email);
+            const safeMessage = this.escapeHTML(item.message);
+            const safeReply = this.escapeHTML(item.reply || '');
+            const hasReply = !!item.reply;
+
+            const card = document.createElement('div');
+            card.className = 'admin-feedback-card';
+
+            card.innerHTML = `
+                <div class="admin-feedback-header">
+                    <div>
+                        <span class="af-user">${safeName}</span>
+                        <span class="af-email">${safeEmail}</span>
+                    </div>
+                    <div>
+                        <span class="af-type ${item.type}">${item.type}</span>
+                        <span class="feedback-date" style="margin-left: 10px;">${date}</span>
+                    </div>
+                </div>
+                <div class="admin-feedback-msg">${safeMessage}</div>
+                <div class="admin-feedback-reply-area">
+                    <textarea class="admin-input af-reply-input" id="reply-input-${item.id}" placeholder="Type your response...">${safeReply}</textarea>
+                    <button class="btn btn-primary btn-sm" onclick="window.submitAdminReply('${item.id}')" style="margin-top: 5px;">
+                        ${hasReply ? 'Update Reply' : 'Send Reply'}
+                    </button>
+                    <div class="form-error" id="reply-error-${item.id}" style="text-align: left; margin: 0;"></div>
+                </div>
+            `;
+            this.listArea.appendChild(card);
+        });
+    }
+
+    escapeHTML(str) {
+        if (!str) return '';
+        return str.replace(/[&<>'"]/g, tag => ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            "'": '&#39;',
+            '"': '&quot;'
+        }[tag]));
+    }
+}
+
+// Global function to handle replies
+window.submitAdminReply = async function (id) {
+    const input = document.getElementById(`reply-input-${id}`);
+    const errObj = document.getElementById(`reply-error-${id}`);
+    const replyText = input.value.trim();
+
+    if (!replyText) {
+        errObj.textContent = "Reply cannot be empty.";
+        errObj.style.color = "#ef5350";
+        return;
+    }
+
+    try {
+        errObj.textContent = "Sending...";
+        errObj.style.color = "var(--color-neon-blue)";
+
+        const { error } = await dbClient
+            .from('feedbacks')
+            .update({
+                reply: replyText,
+                replied_at: new Date().toISOString()
+            })
+            .eq('id', id);
+
+        if (error) throw error;
+
+        errObj.textContent = "Reply sent successfully.";
+        errObj.style.color = "#66bb6a";
+
+        setTimeout(() => { errObj.textContent = ''; }, 3000);
+
+    } catch (err) {
+        console.error("Error replying to feedback", err);
+        errObj.textContent = "Failed to send reply.";
+        errObj.style.color = "#ef5350";
+    }
+};
+
+// ============================================================================
 // INITIALIZATION
 // ============================================================================
 
 document.addEventListener('DOMContentLoaded', () => {
     checkExistingSession();
     console.log('🔐 Next Level Admin Dashboard loaded');
-}); 
+});
