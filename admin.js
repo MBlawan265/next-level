@@ -15,10 +15,11 @@ const STORAGE_KEYS = {
     YOUTUBE_URL: 'nextlevel_youtube_url'
 };
 
-// Initialize Admin-Level Supabase Client (bypasses RLS)
+// Initialize Admin-Level Supabase Client
+// Uses service key if available (to bypass RLS for admin), otherwise falls back to anon key
 const dbClient = window.supabase.createClient(
     window.NEXTLEVEL_CONFIG.supabaseUrl,
-    window.NEXTLEVEL_CONFIG.supabaseServiceKey
+    window.NEXTLEVEL_CONFIG.supabaseServiceKey || window.NEXTLEVEL_CONFIG.supabaseKey
 );
 
 // ============================================================================
